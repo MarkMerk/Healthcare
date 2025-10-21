@@ -11,11 +11,17 @@ Welcome to our official repository for AGAthon Frankfurt 2025! This repository c
 
 Project Description
 
-Add a brief description of your project here. What problem are you solving? What is your solution?
+Patienten Aufenthaltsvorhersage
+
+Die Belegung von Betten sowie die präzise Einschätzung ihrer Wiederverfügbarkeit erfordern ein hohes Maß an Erfahrung – eine Kompetenz, die erfahrenem Pflegepersonal oder ärztlichem Fachpersonal zu zuordnen ist. Aktuell basieren Prognosen zu Entlasszeitpunkten häufig auf Erfahrungswerten, was nicht selten zu Engpässen, Verlegungen, Verzögerungen und führt. Die Challenge besteht darin, auf Basis weniger bei der Aufnahme verfügbarer Merkmale – wie Alter, Fachabteilung oder Hauptdiagnose – eine patientenindividuelle Verweildauer zuverlässig vorherzusagen. Zu diesem Zweck stellen wir echte, anonymisierte Routinedaten bereit, um Kapazitäten frühzeitig sichtbar zu machen, Entlassmanagement gezielt zu automatisieren und zukünftige Kapazitäten vorhersagen zu können. 
+
+Inspo
+
+https://www.kaggle.com/datasets/nehaprabhavalkar/av-healthcare-analytics-ii/data
 
 Tech Stack
 	•	Frontend: Add your technologies
-	•	Backend: Add your technologies
+	•	Backend: Jupyter Notebook
 	•	Database: Add your technologies
 	•	Other Tools/Services: Add your tools
 
