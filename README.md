@@ -15,9 +15,20 @@ Patienten Aufenthaltsvorhersage
 
 Die Belegung von Betten sowie die präzise Einschätzung ihrer Wiederverfügbarkeit erfordern ein hohes Maß an Erfahrung – eine Kompetenz, die erfahrenem Pflegepersonal oder ärztlichem Fachpersonal zu zuordnen ist. Aktuell basieren Prognosen zu Entlasszeitpunkten häufig auf Erfahrungswerten, was nicht selten zu Engpässen, Verlegungen, Verzögerungen und führt. Die Challenge besteht darin, auf Basis weniger bei der Aufnahme verfügbarer Merkmale – wie Alter, Fachabteilung oder Hauptdiagnose – eine patientenindividuelle Verweildauer zuverlässig vorherzusagen. Zu diesem Zweck stellen wir echte, anonymisierte Routinedaten bereit, um Kapazitäten frühzeitig sichtbar zu machen, Entlassmanagement gezielt zu automatisieren und zukünftige Kapazitäten vorhersagen zu können. 
 
+English verson
+
+The occupation of beds and the precise estimation of their re-availability require a high degree of experience – a competence that is typically attributed to experienced nursing or medical specialists. Currently, prognoses regarding discharge times are often based on empirical values, which not infrequently leads to bottlenecks, transfers, and delays. The challenge is to reliably predict a patient-specific length of stay based on a few characteristics available at admission – such as age, specialist department, or primary diagnosis. To this end, we provide real, anonymized routine data to make capacities visible early on, specifically automate discharge management, and predict future capacities.
+
 Inspo
 
 https://www.kaggle.com/datasets/nehaprabhavalkar/av-healthcare-analytics-ii/data
+
+Steps
+	- Try to run and understand whats done in the two examples
+	- Try to improve the examples and compare the scores
+	- Create a web framework for UI where the params could be submitted
+	- Cleanup the GitHub and legal data formalization
+	- Create a presentation and description of results
 
 Tech Stack
 	•	Frontend: Add your technologies
