@@ -48,7 +48,7 @@ This method uses the `environment.yml` file to recreate the exact development en
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/MarkMerk/AGAthon.git](https://github.com/MarkMerk/AGAthon.git)
+    git clone https://github.com/MarkMerk/AGAthon.git
     cd AGAthon
     ```
 2.  **Ensure you have Conda installed.** If not, we recommend installing [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/).
@@ -69,7 +69,7 @@ This method uses the `requirements.txt` file with `pip`. Note that this might no
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/MarkMerk/AGAthon.git](https://github.com/MarkMerk/AGAthon.git)
+    git clone https://github.com/MarkMerk/AGAthon.git
     cd AGAthon
     ```
 2.  **Ensure you have Python installed** (version 3.10 or higher recommended).
