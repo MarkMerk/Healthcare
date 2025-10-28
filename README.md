@@ -38,18 +38,54 @@ Tech Stack
 
 Repository Structure
 
-Setup & Installation
-	1.	Clone the repository:
+## 🛠️ Setup & Installation
 
-git clone https://github.com/MarkMerk/AGAthon.git
+Follow these steps to set up the project environment on your local machine. We recommend using Conda and the provided `environment.yml` file for the most reliable setup.
 
-	2.	Install dependencies:
+### Option 1: Using Conda (Recommended)
 
-# Add your installation commands here
+This method uses the `environment.yml` file to recreate the exact development environment, including specific package versions and non-Python dependencies.
 
-	3.	Run the project:
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/MarkMerk/AGAthon.git](https://github.com/MarkMerk/AGAthon.git)
+    cd AGAthon
+    ```
+2.  **Ensure you have Conda installed.** If not, we recommend installing [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/).
+3.  **Create the Conda environment** from the `environment.yml` file. This command reads the file and installs all specified dependencies:
+    ```bash
+    conda env create -f environment.yml
+    ```
+    *(This might take a few minutes as it downloads and installs all packages)*
+4.  **Activate the environment:**
+    ```bash
+    conda activate agathon
+    ```
+    Your terminal prompt should now show `(agathon)` at the beginning.
 
-# Add your run/start commands here
+### Option 2: Using pip (Alternative)
+
+This method uses the `requirements.txt` file with `pip`. Note that this might not capture non-Python dependencies and relies on `pip`'s dependency resolution, which could lead to minor differences from the original Conda environment.
+
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/MarkMerk/AGAthon.git](https://github.com/MarkMerk/AGAthon.git)
+    cd AGAthon
+    ```
+2.  **Ensure you have Python installed** (version 3.10 or higher recommended).
+	Check the default python command (might be Python 2 or 3 depending on your system)
+	```bash
+	python --version
+	```
+
+	Check the specific Python 3 version (recommended)
+	```bash
+	python3 --version
+	```
+3.  **Install dependencies** using `pip` and the `requirements.txt` file:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 Goals & Milestones
 	•	Define problem statement
