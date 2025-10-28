@@ -1,0 +1,15 @@
+# Note: For best reproducibility, use the environment.yml file with Conda.
+
+pandas
+scikit-learn
+matplotlib
+ipython
+ipykernel
+seaborn
+numpy<2
+kagglehub
+imbalanced-learn
+optuna==4.5.0
+alembic==1.17.0
+keras==3.12.0
+tensorflow==2.20.0
