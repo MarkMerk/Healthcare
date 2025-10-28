@@ -1,4 +1,4 @@
-name: test1
+name: agathon
 channels:
   - defaults
   - https://repo.anaconda.com/pkgs/main
