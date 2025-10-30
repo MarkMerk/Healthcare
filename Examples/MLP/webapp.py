@@ -1,199 +1,176 @@
+import joblib
 import streamlit as st
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-import joblib
+from keras.layers import PReLU 
 
-# --- 1. LOAD ARTIFACTS AND CONFIG ---
+# --- Define the Model Artifacts and Categorical Orderings ---
 
-# Use caching for resources to load them only once
+# 1. Custom object for Keras (needed for loading models with custom layers)
+custom_objects = {'PReLU': PReLU}
+
+# 2. Define the logical order for ordered categorical features (for sorting dropdowns)
+AGE_ORDER = [
+    '0-10', '11-20', '21-30', '31-40', '41-50', 
+    '51-60', '61-70', '71-80', '81-90', '91-100'
+]
+
+SEVERITY_ORDER = [
+    'Minor', 'Moderate', 'Major', 'Extreme'
+]
+
+BED_GRADE_ORDER = [1.0, 2.0, 3.0, 4.0] 
+
+# 3. Stay label mapping (assuming this is your model's target mapping)
+STAY_MAPPING = {
+    '0-10': 0, '11-20': 1, '21-30': 2, '31-40': 3, '41-50': 4, 
+    '51-60': 5, '61-70': 6, '71-80': 7, '81-90': 8, '91-100': 9, 'More than 100 Days': 10
+}
+# Reverse mapping for output
+STAY_LABEL = {v: k for k, v in STAY_MAPPING.items()}
+
+
+# --- Artifact Loading Function (Cached) ---
+
 @st.cache_resource
 def load_artifacts():
     """
-    Loads the saved model and preprocessing transformer.
+    Loads the saved Keras model (using the .h5 fix) and preprocessing ColumnTransformer.
     """
-    # Load the Keras model
-    # Note: You might need to provide custom_objects if your PReLU isn't standard
-    model = tf.keras.models.load_model(
-        'model.h5'
-    )
-    # Load the ColumnTransformer
-    ct = joblib.load('column_transformer.joblib')
-    
-    return model, ct
+    try:
+        # Load the model using the .h5 format fix
+        model = tf.keras.models.load_model(
+            'model.h5', 
+            custom_objects=custom_objects,
+            compile=False # Load only for inference
+        )
+        # Load the ColumnTransformer
+        ct = joblib.load('column_transformer.joblib')
+        return model, ct
+    except Exception as e:
+        # Display the error directly in the app
+        st.error(f"Error loading model artifacts: {e}")
+        return None, None
 
-# Load the model and transformer
 model, ct = load_artifacts()
 
-# Define the class mapping from your notebook (cell 56)
-STAY_CLASSES = {
-    0: '0-10',
-    1: '11-20',
-    2: '21-30',
-    3: '31-40',
-    4: '41-50',
-    5: '51-60',
-    6: '61-70',
-    7: '71-80',
-    8: '81-90',
-    9: '91-100',
-    10: 'More than 100 Days'
-}
-
-# Define the exact feature order from your training (cell 44)
-FEATURE_ORDER = [
-    'Hospital_code', 'Hospital_type_code', 'City_Code_Hospital', 
-    'Hospital_region_code', 'Available Extra Rooms in Hospital', 'Department', 
-    'Ward_Type', 'Ward_Facility_Code', 'Bed Grade', 'City_Code_Patient', 
-    'Type of Admission', 'Severity of Illness', 'Visitors with Patient', 'Age', 
-    'Admission_Deposit'
-]
-
-# --- 2. BUILD THE USER INTERFACE (UI) ---
-
-st.set_page_config(page_title="Patient Stay Prediction", layout="wide")
-st.title('🏥 Patient Stay Duration Predictor')
-st.markdown("Enter the patient's details on the left to predict their length of stay.")
-
-# Use a sidebar for inputs
-st.sidebar.header("Enter Patient Admission Details")
-
-# Create columns for a cleaner layout in the sidebar
-col1, col2 = st.sidebar.columns(2)
-
-# --- Column 1 Inputs ---
-with col1:
-    age = st.selectbox(
-        'Age', 
-        options=['31-40', '41-50', '51-60', '21-30', '71-80', '61-70', '11-20', '81-90', '0-10', '91-100'],
-        index=0
-    )
-    severity_of_illness = st.selectbox(
-        'Severity of Illness', 
-        options=['Moderate', 'Minor', 'Extreme'],
-        index=0
-    )
-    type_of_admission = st.selectbox(
-        'Type of Admission', 
-        options=['Trauma', 'Emergency', 'Urgent'],
-        index=0
-    )
-    department = st.selectbox(
-        'Department', 
-        options=['gynecology', 'anesthesia', 'radiotherapy', 'TB & Chest disease', 'surgery'],
-        index=0
-    )
-    bed_grade = st.selectbox(
-        'Bed Grade', 
-        options=[2, 3, 4, 1],
-        index=0
-    )
-    hospital_code = st.selectbox(
-        'Hospital Code', 
-        options=[26, 23, 19, 6, 11, 28, 14, 27, 9, 12, 29, 32, 25, 10, 15, 21, 24, 3, 17, 1, 13, 5, 2, 30, 22, 31, 16, 8, 18, 20, 7, 4],
-        index=0
-    )
-    hospital_type_code = st.selectbox(
-        'Hospital Type Code', 
-        options=['a', 'b', 'c', 'e', 'd', 'f', 'g'],
-        index=0
-    )
+if model is not None and ct is not None:
     
-# --- Column 2 Inputs ---
-with col2:
-    admission_deposit = st.number_input(
-        'Admission Deposit', 
-        min_value=0.0, 
-        max_value=12000.0, 
-        value=4500.0, 
-        step=100.0
-    )
-    visitors_with_patient = st.number_input(
-        'Visitors with Patient', 
-        min_value=0, 
-        max_value=40, 
-        value=2, 
-        step=1
-    )
-    city_code_patient = st.selectbox(
-        'City Code (Patient)', 
-        options=[8, 2, 1, 7, 5, 4, 9, 15, 10, 6, 12, 3, 23, 14, 16, 13, 21, 20, 18, 19, 26, 25, 27, 11, 28, 22, 24, 30, 29, 33, 31, 37, 32, 34, 35, 36, 38],
-        index=0
-    )
-    ward_type = st.selectbox(
-        'Ward Type', 
-        options=['R', 'Q', 'S', 'P', 'T', 'U'],
-        index=0
-    )
-    ward_facility_code = st.selectbox(
-        'Ward Facility Code', 
-        options=['F', 'E', 'D', 'C', 'B', 'A'],
-        index=0
-    )
-    city_code_hospital = st.selectbox(
-        'City Code (Hospital)', 
-        options=[1, 2, 6, 7, 3, 5, 9, 11, 4, 10, 13],
-        index=0
-    )
-    hospital_region_code = st.selectbox(
-        'Hospital Region Code', 
-        options=['X', 'Y', 'Z'],
-        index=0
-    )
+    st.title("🏥 Patient Stay Duration Predictor")
+    st.markdown("Enter patient and hospital details to predict the length of stay.")
 
-# This input is not in col1 or col2 to span the full sidebar width
-available_extra_rooms = st.number_input(
-    'Available Extra Rooms in Hospital', 
-    min_value=0, 
-    max_value=25, 
-    value=3, 
-    step=1
-)
-
-
-# --- 3. PREDICTION LOGIC ---
-
-# Create a button to trigger the prediction
-if st.sidebar.button('Predict Stay Duration', use_container_width=True):
+    # --- UI LAYOUT AND INPUTS (Sorted where applicable) ---
     
-    # 1. Collect inputs into a dictionary
-    input_data = {
-        'Hospital_code': hospital_code,
-        'Hospital_type_code': hospital_type_code,
-        'City_Code_Hospital': city_code_hospital,
-        'Hospital_region_code': hospital_region_code,
-        'Available Extra Rooms in Hospital': available_extra_rooms,
-        'Department': department,
-        'Ward_Type': ward_type,
-        'Ward_Facility_Code': ward_facility_code,
-        'Bed Grade': float(bed_grade), # Match training data type
-        'City_Code_Patient': float(city_code_patient), # Match training data type
-        'Type of Admission': type_of_admission,
-        'Severity of Illness': severity_of_illness,
-        'Visitors with Patient': visitors_with_patient,
-        'Age': age,
-        'Admission_Deposit': admission_deposit
-    }
-    
-    # 2. Convert to DataFrame in the correct order
-    input_df = pd.DataFrame([input_data])
-    input_df = input_df[FEATURE_ORDER]
+    col1, col2 = st.columns(2)
 
-    # 3. Transform the data using the loaded ColumnTransformer
-    # The 'ct' object already knows which columns to OneHotEncode, 
-    # which to scale, and which to pass through.
-    try:
-        transformed_data = ct.transform(input_df)
+    # Column 1 Inputs
+    with col1:
+        # SORTED CATEGORICAL INPUTS
+        age = st.selectbox("Age", options=AGE_ORDER)
+        severity = st.selectbox("Severity of Illness", options=SEVERITY_ORDER)
+        bed_grade = st.selectbox("Bed Grade", options=BED_GRADE_ORDER)
         
-        # 4. Make prediction
-        prediction_proba = model.predict(transformed_data)
+        # UNSORTED CATEGORICAL INPUTS (Adjust options as per your training data)
+        hospital_type_code = st.selectbox("Hospital Type Code", options=['a', 'b', 'c', 'd', 'e', 'f', 'g'])
+        hospital_region_code = st.selectbox("Hospital Region Code", options=['X', 'Y', 'Z'])
+        ward_type = st.selectbox("Ward Type", options=['R', 'S', 'Q', 'P', 'T', 'U'])
+        ward_facility_code = st.selectbox("Ward Facility Code", options=['F', 'E', 'D', 'C', 'B', 'A'])
+        department = st.selectbox("Department", options=['radiotherapy', 'anesthesia', 'gynecology', 'TB & Chest disease', 'surgery'])
+
+
+
+    # Column 2 Inputs
+    with col2:
+        # Unsorted Categorical Inputs
+        admission_type = st.selectbox("Type of Admission", options=['Emergency', 'Trauma', 'Urgent'])
         
-        # 5. Post-process the prediction
-        prediction_index = np.argmax(prediction_proba, axis=-1)[0]
-        prediction_label = STAY_CLASSES[prediction_index]
+        # Numerical Inputs
+        available_rooms = st.number_input("Available Extra Rooms in Hospital", min_value=1, value=3, step=1)
+        admission_deposit = st.number_input("Admission Deposit", min_value=0.0, value=4000.0, step=0.1)
 
-        # 6. Display the result
-        st.success(f"**Predicted Stay Duration:** `{prediction_label}` days")
+        # Codes (Adjust values as per your training data)
+        hospital_code = st.number_input("Hospital Code", min_value=1, value=8, step=1)
+        city_code_hospital = st.number_input("City Code Hospital", min_value=1, value=3, step=1)
+        
+        # Patient ID/City Codes - included for completeness
+        patientid = st.number_input("Patient ID", min_value=1, value=31397, step=1)
+        city_code_patient = st.number_input("City Code Patient", min_value=1.0, value=7.0, step=1.0)
 
-    except Exception as e:
-        st.error(f"An error occurred during prediction: {e}")
+        # Numerical Input
+        visitors = st.number_input("Visitors with Patient", min_value=0, value=2, step=1)
+
+
+    # --- Prediction Logic (Display in the same window) ---
+    if st.button("Predict Stay"):
+        
+        # 1. Create a DataFrame from inputs
+        input_data = pd.DataFrame({
+            'Hospital_code': [hospital_code],
+            'Hospital_type_code': [hospital_type_code],
+            'City_Code_Hospital': [city_code_hospital],
+            'Hospital_region_code': [hospital_region_code],
+            'Available Extra Rooms in Hospital': [available_rooms],
+            'Department': [department],
+            'Ward_Type': [ward_type],
+            'Ward_Facility_Code': [ward_facility_code],
+            'Bed Grade': [bed_grade],
+            'patientid': [patientid],
+            'City_Code_Patient': [city_code_patient],
+            'Type of Admission': [admission_type],
+            'Severity of Illness': [severity],
+            'Visitors with Patient': [visitors],
+            'Age': [age],
+            'Admission_Deposit': [admission_deposit]
+        })
+
+        # 2. Preprocess the input data
+        try:
+            processed_data = ct.transform(input_data)
+        except Exception as e:
+            st.error(f"Error during preprocessing: {e}. Please check input values.")
+
+        # 3. Make Prediction
+        with st.spinner("Calculating prediction..."):
+            prediction_proba = model.predict(processed_data)
+            
+            # Get the index of the class with the highest probability
+            predicted_class_index = np.argmax(prediction_proba, axis=1)[0]
+            
+            # Get the label
+            predicted_stay_label = STAY_LABEL.get(predicted_class_index, "Unknown Stay Duration")
+
+        # 4. Display Prediction (Combined Output)
+        st.subheader("🎉 Prediction Result")
+        st.success(f"The predicted length of stay is: **{predicted_stay_label}**")
+
+        # Add a Bar Chart for Visualization
+            
+        
+        # Sort by Stay Duration (for a cleaner-looking bar chart order)
+        # Note: We create a list of stay labels that matches the index order (0 to 10)
+        # to ensure the bar chart's x-axis is sequential.
+        st.markdown("---")
+        st.subheader("Probability Distribution")
+        stay_order_list = [STAY_LABEL[i] for i in range(len(STAY_LABEL))]
+        proba_df = pd.DataFrame(
+            prediction_proba[0], 
+            index=list(STAY_LABEL.values()), 
+            columns=['Probability']
+        )
+        proba_df = proba_df.sort_values(by='Probability', ascending=False)       
+        proba_df_display = proba_df.reindex(stay_order_list)
+
+        st.bar_chart(proba_df_display, use_container_width=True)
+
+        # Optional: Show all probabilities for transparency
+        st.markdown("---")
+        st.subheader("Detailed Class Probabilities:")
+        
+        # Create a DataFrame for display, sorted by probability (descending)
+
+        st.dataframe(proba_df, use_container_width=True)
+
+
+else:
+    st.error("Model or Column Transformer could not be loaded. Please ensure 'model.h5' and 'column_transformer.joblib' are in the same directory.")
