@@ -87,6 +87,13 @@ This method uses the `requirements.txt` file with `pip`. Note that this might no
     pip install -r requirements.txt
     ```
 
+### Running the app
+
+1.  **After installing all of the requirements:**
+    ```bash
+    streamlit run webapp.py
+    ```
+
 Goals & Milestones
 	•	Define problem statement
 	•	Design architecture & workflow
