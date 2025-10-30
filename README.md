@@ -91,6 +91,7 @@ This method uses the `requirements.txt` file with `pip`. Note that this might no
 
 1.  **After installing all of the requirements:**
     ```bash
+	cd Examples/MLP
     streamlit run webapp.py
     ```
 
