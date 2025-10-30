@@ -20,3 +20,4 @@ dependencies:
       - alembic==1.17.0
       - keras==3.12.0
       - tensorflow==2.16.2
+      - tensorflow-macos==2.16.2
