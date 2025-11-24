@@ -1,7 +1,3 @@
-Here is the updated README in Markdown. I have moved the demo link to the very top, added the explanation of the web application's functionality, and updated the tech stack with the AWS details and Machine Learning components.
-
-Markdown
-
 # Patient Length of Stay Prediction (MVP)
 
 **Author:** Mark Merkouchev
@@ -46,32 +42,32 @@ Follow these steps to set up the project environment on your local machine. We r
 This method uses the `environment.yml` file to recreate the exact development environment.
 
 1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/MarkMerk/AGAthon.git](https://github.com/MarkMerk/AGAthon.git)
-    cd AGAthon
-    ```
+```bash
+git clone 'https://github.com/MarkMerk/Healthcare.git'
+cd AGAthon
+```
 2.  **Ensure you have Conda installed.** If not, we recommend installing [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/).
 3.  **Create the Conda environment:**
-    ```bash
-    conda env create -f environment.yml
-    ```
+```bash
+conda env create -f environment.yml
+```
 4.  **Activate the environment:**
-    ```bash
-    conda activate agathon
-    ```
+```bash
+conda activate agathon
+```
 
 ### Option 2: Using pip (Alternative)
 
 1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/MarkMerk/AGAthon.git](https://github.com/MarkMerk/AGAthon.git)
-    cd AGAthon
-    ```
+```bash
+git clone 'https://github.com/MarkMerk/Healthcare.git'
+cd AGAthon
+```
 2.  **Ensure you have Python installed** (version 3.10 or higher recommended).
 3.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+pip install -r requirements.txt
+```
 
 ### Running the App Locally
 
