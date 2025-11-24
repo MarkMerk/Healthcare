@@ -1,4 +1,4 @@
-name: agathon
+name: patient-stay-mvp
 channels:
   - defaults
   - https://repo.anaconda.com/pkgs/main
